@@ -10,7 +10,7 @@ Make sure Set your Beat Saber Path in `pc_beatsaberpath` in `config.json`
 
 # If using Quest 1/2
 
-You need Install [SIDEQUEST](https://sidequestvr.com) and have `enable_automatic_upload_to_quest` on `true`  in `config.json`
+You need Install [SIDEQUEST](https://sidequestvr.com) and have `enable_automatic_upload_to_quest` on `true` and `toggle` on `true` in `config.json`
 
 Command do it is `!bsr 1b898` You find that data from 1b898 in `https://bsaber.com/songs/1b898/`
 
