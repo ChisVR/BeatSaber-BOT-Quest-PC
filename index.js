@@ -21,11 +21,21 @@ const adb = `${config.adb_folder}\\adb.exe`;
 var questConnected = false;
 var questIpAddress = ``;
 
+
+if (config.twitch.anonymous == true) {
+	
+const client = new tmi.client({
+    channels: [config.twitch.channel]
+});
+	
+} else {
+
 const client = new tmi.client({
     identity: { username: config.twitch.user, password: config.twitch.oauth },
     channels: [config.twitch.channel]
 });
-
+	
+}
 var vimmchannel = config.vimm.channel;
 
 client.on('connected', onConnectedHandler);
@@ -104,7 +114,7 @@ function processBsr(message, username, channel) {
             fetchMapInfoPC(arg, username, channel);
         }
     } else {
-        client.say(channel, config.message.manual);
+        if (config.twitch.anonymous == false) return client.say(channel, config.message.manual);
     }
     return true;
 }
@@ -207,7 +217,7 @@ async function downloadQUEST(url, fileName, hash, message, channel) {
             });
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
-            client.say(channel, message);
+            if (config.twitch.anonymous == false) return client.say(channel, message);
             if (questConnected) {
                 extractZipQUEST(hash, filePath);
             }
