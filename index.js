@@ -330,7 +330,7 @@ async function downloadPC(url, fileName, hash, message, channel) {
             });
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
-            client.say(channel, message);
+            if (config.twitch.anonymous == false) return client.say(channel, message);
             extractZipPC(hash, filePath);
             resolve();
         });
