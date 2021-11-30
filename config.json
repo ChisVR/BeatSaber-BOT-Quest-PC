@@ -1,13 +1,13 @@
 {
     "twitch": {
-		"toggle": true,
+        "toggle": true,
         "user": "BOTUSER",
         "oauth": "BOTOAUTH",
         "channel": "YOURCHANNEL"
     },
 
     "vimm": {
-		"toggle": true,
+        "toggle": true,
         "channel": "YOURCHANNEL",
         "token": "BOTTOKEN"
     },
@@ -18,7 +18,7 @@
         "enable_automatic_upload_to_quest": false
     },
 	
-	"pc_beatsaberpath": "D:\\SteamLibrary\\SteamApps\\common\\Beat Saber",
+    "pc_beatsaberpath": "D:\\SteamLibrary\\SteamApps\\common\\Beat Saber",
 	
     "user_agent": "BeatSaber-BOT-Quest-PC/1.0.0 (+https://github.com/ChisdealHDYT/BeatSaber-BOT-Quest-PC)",
     "message": {
