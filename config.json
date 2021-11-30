@@ -1,0 +1,27 @@
+{
+    "twitch": {
+		"toggle": true,
+        "user": "BOTUSER",
+        "oauth": "BOTOAUTH",
+        "channel": "YOURCHANNEL"
+    },
+
+    "vimm": {
+		"toggle": true,
+        "channel": "YOURCHANNEL",
+        "token": "BOTTOKEN"
+    },
+
+    "questdata": {
+        "toggle": false,
+        "adb_folder": "%appdata%\\SideQuest\\platform-tools",
+        "enable_automatic_upload_to_quest": false
+    },
+	
+	"pc_beatsaberpath": "D:\\SteamLibrary\\SteamApps\\common\\Beat Saber",
+	
+    "user_agent": "BeatSaber-BOT-Quest-PC/1.0.0 (+https://github.com/ChisdealHDYT/BeatSaber-BOT-Quest-PC)",
+    "message": {
+        "manual": "To request song, find a song at bsaber.com and click on twitch logo under a song to copy the code, then paste in the chat. I made a video guide here https://imgur.com/a/a0s0qqa"
+    }
+}
