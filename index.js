@@ -21,21 +21,15 @@ const adb = `${config.adb_folder}\\adb.exe`;
 var questConnected = false;
 var questIpAddress = ``;
 
-
-if (config.twitch.anonymous == true) {
-	
 const client = new tmi.client({
-    channels: [config.twitch.channel]
-});
-	
-} else {
-
-const client = new tmi.client({
+    connection: {
+        secure: true,
+        reconnect: true
+    },
     identity: { username: config.twitch.user, password: config.twitch.oauth },
     channels: [config.twitch.channel]
 });
-	
-}
+
 var vimmchannel = config.vimm.channel;
 
 client.on('connected', onConnectedHandler);
@@ -114,7 +108,7 @@ function processBsr(message, username, channel) {
             fetchMapInfoPC(arg, username, channel);
         }
     } else {
-        if (config.twitch.anonymous == false) return client.say(channel, config.message.manual);
+        client.say(channel, config.message.manual);
     }
     return true;
 }
@@ -217,7 +211,7 @@ async function downloadQUEST(url, fileName, hash, message, channel) {
             });
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
-            if (config.twitch.anonymous == false) return client.say(channel, message);
+            client.say(channel, message);
             if (questConnected) {
                 extractZipQUEST(hash, filePath);
             }
@@ -330,7 +324,7 @@ async function downloadPC(url, fileName, hash, message, channel) {
             });
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
-            if (config.twitch.anonymous == false) return client.say(channel, message);
+            client.say(channel, message);
             extractZipPC(hash, filePath);
             resolve();
         });
