@@ -1,6 +1,7 @@
 {
     "twitch": {
         "toggle": true,
+	"anonymous": true,
         "user": "BOTUSER",
         "oauth": "BOTOAUTH",
         "channel": "YOURCHANNEL"
