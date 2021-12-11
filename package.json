@@ -17,6 +17,7 @@
     "node-fetch": "^2.6.1",
     "sanitize-filename": "^1.6.3",
     "tmi.js": "^1.8.5",
+	"glimesh-chat-lib": "^1.0.2",
     "vimm-chat-lib": "^1.0.2"
   }
 }

@@ -12,6 +12,27 @@
         "channel": "YOURCHANNEL",
         "token": "BOTTOKEN"
     },
+	
+	"glimesh": {
+		"toggle": true,
+		"botUsername": "BOTUSERNAME",
+		"channel": "YOURCHANNEL",
+		"token": "BOTTOKEN",
+		"clientid": "CLIENTID"
+	},
+	
+	"theta": {
+		"toggle": true,
+		"username": "BOTUSERNAME",
+		"token": "BOTTOKEN",
+		"user": "YOURCHANNEL",
+		"channelid": "YOURCHANNELID",
+		"channels": ["chat."],
+		"pubnub": {
+			"uuid": "BOTUUID",
+			"subscribe_key": "BOTSUBKEY" 
+		}
+	},
 
     "questdata": {
         "toggle": false,

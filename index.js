@@ -17,6 +17,13 @@ const vimmchat = new Vimm.VimmChat({
 	
 })
 
+const Glimesh = require("glimesh-chat-lib")
+const chatglimesh = new Glimesh.GlimeshChat({
+	token: config.glimesh.token,
+	clientId: config.glimesh.clientid,
+	debug: false // Outputs heartbeat logs if true.
+})
+
 const adb = `${config.adb_folder}\\adb.exe`;
 var questConnected = false;
 var questIpAddress = ``;
@@ -113,6 +120,33 @@ function processBsr(message, username, channel) {
     return true;
 }
 
+if (config.glimesh.toggle == true) {
+	
+	chatglimesh.connect(config.glimesh.channel).then(meta => { 
+
+		chatglimesh.on("message", msgglim => {
+		
+			if(msgglim.user.username == config.glimesh.botUsername) return
+			
+			const command = `!bsr`;
+            if (!msgglim.message.startsWith(command)) { return false; }
+
+            const arg = msgglim.message.slice(command.length + 1);
+            if (msgglim.message.charAt(command.length) == ` ` && arg.length > 0) {
+                if (config.questdata.toggle == true) {
+                    fetchMapInfoGLIMQUEST(arg, msgglim.user.username);
+                } else {
+                    fetchMapInfoGLIMPC(arg, msgglim.user.username);
+                }
+            } else {
+                chatglimesh.sendMessage(config.message.manual);
+            }
+					
+		})
+
+	})
+
+}
 
 if (config.vimm.toggle == true) {
 	
@@ -178,7 +212,6 @@ function fetchMapInfoQUEST(mapId, username, channel) {
         .catch(err => console.log(err));
 }
 
-
 function fetchMapInfoVimmQUEST(mapId, username, channel) {
     const url = `https://api.beatsaver.com/maps/id/${mapId}`;
 
@@ -191,6 +224,22 @@ function fetchMapInfoVimmQUEST(mapId, username, channel) {
             const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
             const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
             downloadVimmQUEST(downloadUrl, fileName, versions.hash, message, channel);
+        })
+        .catch(err => console.log(err));
+}
+
+function fetchMapInfoGLIMQUEST(mapId, username) {
+    const url = `https://api.beatsaver.com/maps/id/${mapId}`;
+
+    console.log(`* Getting map info...`);
+    fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
+        .then(res => res.json())
+        .then(info => {
+            const versions = info.versions[0]
+            const downloadUrl = versions.downloadURL;
+            const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
+            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
+            downloadGLIMQUEST(downloadUrl, fileName, versions.hash, message);
         })
         .catch(err => console.log(err));
 }
@@ -235,6 +284,29 @@ async function downloadVimmQUEST(url, fileName, hash, message, channel) {
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
             vimmchat.sendMessage(channel, message);
+            if (questConnected) {
+                extractZipQUEST(hash, filePath);
+            }
+            resolve();
+        });
+    });
+}
+
+async function downloadGLIMQUEST(url, fileName, hash, message) {
+    await new Promise((resolve, reject) => {
+        console.log(`* Downloading map...`);
+        const mapsFolder = `maps`;
+        if (!fs.existsSync(mapsFolder)){
+            fs.mkdirSync(mapsFolder);
+        }
+        const filePath = `${mapsFolder}/${fileName}`;
+        const fileStream = fs.createWriteStream(filePath);
+            http.get(`${url}`, function(response) {
+                response.pipe(fileStream);
+            });
+        fileStream.on("finish", function() {
+            console.log(`* Downloaded "${fileName}"`);
+            chatglimesh.sendMessage(message);
             if (questConnected) {
                 extractZipQUEST(hash, filePath);
             }
@@ -308,7 +380,21 @@ function fetchMapInfoVimmPC(mapId, username, channel) {
         .catch(err => console.log(err));
 }
 
+function fetchMapInfoGLIMPC(mapId, username) {
+    const url = `https://api.beatsaver.com/maps/id/${mapId}`;
 
+    console.log(`* Getting map info...`);
+    fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
+        .then(res => res.json())
+        .then(info => {
+            const versions = info.versions[0]
+            const downloadUrl = versions.downloadURL;
+            const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
+            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
+            downloadGLIMPC(downloadUrl, fileName, versions.hash, message);
+        })
+        .catch(err => console.log(err));
+}
 
 async function downloadPC(url, fileName, hash, message, channel) {
     await new Promise((resolve, reject) => {
@@ -346,6 +432,27 @@ async function downloadVimmPC(url, fileName, hash, message, channel) {
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
             vimmchat.sendMessage(channel, message);
+            extractZipPC(hash, filePath);
+            resolve();
+        });
+    });
+}
+
+async function downloadGLIMPC(url, fileName, hash, message) {
+    await new Promise((resolve, reject) => {
+        console.log(`* Downloading map...`);
+        const mapsFolder = `maps`;
+        if (!fs.existsSync(mapsFolder)){
+            fs.mkdirSync(mapsFolder);
+        }
+        const filePath = `${mapsFolder}/${fileName}`;
+        const fileStream = fs.createWriteStream(filePath);
+            http.get(`${url}`, function(response) {
+                response.pipe(fileStream);
+            });
+        fileStream.on("finish", function() {
+            console.log(`* Downloaded "${fileName}"`);
+            chatglimesh.sendMessage(message);
             extractZipPC(hash, filePath);
             resolve();
         });
