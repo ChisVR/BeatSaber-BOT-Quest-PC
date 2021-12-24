@@ -156,7 +156,7 @@ function Connect(){
 	
 		vimmchat.on("message", msg => {
 			
-			if (msg.prefix == "[bot]") return
+			if (msg.roles[0].bot == true) return
 
             const command = `!bsr`;
             if (!msg.message.startsWith(command)) { return false; }
