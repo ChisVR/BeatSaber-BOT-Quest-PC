@@ -18,6 +18,6 @@ Make sure SideQuest not Started / Loaded because using `platform-tools` in that 
 
 If you are using PC version of Beat Saber, it's recommended to use "Song Request Manager" mod instead that can be installed via [ModAssistant](https://github.com/Assistant/ModAssistant), it's better and easier to set up.
 
-and ModAssistant can Reload Songs in UI Options called `"Reload Paylists"`
+and ModAssistant can Reload Songs in UI Options called `"Reload Playlists"`
 
 For Quest `"Beat Saber -> Settings -> Mod Settings -> SongLoader -> Reload New Song"`
