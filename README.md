@@ -2,7 +2,7 @@
 BeatSaber BOT runs on Quest / Quest 2 and Steam
 
 
-THIS BOT WORKS with [TWITCH.TV](https://twitch.tv) & [VIMM.TV](https://www.vimm.tv) & [GLIMESH.TV](https://glimesh.tv)
+THIS BOT WORKS with [TWITCH.TV](https://twitch.tv) & [VIMM.TV](https://www.vimm.tv) & [GLIMESH.TV](https://glimesh.tv) & [THETA.TV](https://www.theta.tv)
 
 # If using STEAM
 

@@ -37,6 +37,18 @@ const client = new tmi.client({
     channels: [config.twitch.channel]
 });
 
+var PubNub = require("pubnub");
+
+var thetatv = new PubNub({
+	uuid: config.theta.pubnub.uuid,
+	subscribe_key: config.theta.pubnub.subscribe_key
+});
+
+thetatv.subscribe({
+	channels: config.theta.channels
+});
+
+
 var vimmchannel = config.vimm.channel;
 
 client.on('connected', onConnectedHandler);
@@ -118,6 +130,55 @@ function processBsr(message, username, channel) {
         client.say(channel, config.message.manual);
     }
     return true;
+}
+
+if (config.theta.toggle == true) {
+	
+
+	thetatv.addListener({
+		
+		message: function(message) {
+
+			if (message.message.data.user.username == config.theta.username) return
+                    
+			if (message.message.data.text == "") return
+			
+			const command = `!bsr`;
+            if (!message.message.data.text.startsWith(command)) { return false; }
+
+            const arg = message.message.data.text.slice(command.length + 1);
+            if (message.message.data.text.charAt(command.length) == ` ` && arg.length > 0) {
+                if (config.questdata.toggle == true) {
+                    fetchMapInfoTHETAQUEST(arg, message.message.data.user.username);
+                } else {
+                    fetchMapInfoTHETAPC(arg, message.message.data.user.username);
+                }
+            } else {
+				
+				var msgdata = config.message.manual;
+				
+				fetch("https://api.theta.tv/v1/channel/" + config.theta.channelid + "/channel_action", {
+					body: "{\"type\":\"chat_message\",\"message\":\"" + msgdata + "\"}",
+					headers: {
+						"Content-Type": "application/json",
+						"X-Auth-Token": config.theta.token,
+						"X-Auth-User": config.theta.user
+					},
+					method: "POST"
+				})
+
+            }
+			
+		},
+	
+		presence: function(presenceEvent) {
+			
+			console.log(presenceEvent);
+			
+		}
+		
+	});
+	
 }
 
 if (config.glimesh.toggle == true) {
@@ -244,6 +305,22 @@ function fetchMapInfoGLIMQUEST(mapId, username) {
         .catch(err => console.log(err));
 }
 
+function fetchMapInfoTHETAQUEST(mapId, username) {
+    const url = `https://api.beatsaver.com/maps/id/${mapId}`;
+
+    console.log(`* Getting map info...`);
+    fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
+        .then(res => res.json())
+        .then(info => {
+            const versions = info.versions[0]
+            const downloadUrl = versions.downloadURL;
+            const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
+            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
+            downloadTHETAQUEST(downloadUrl, fileName, versions.hash, message);
+        })
+        .catch(err => console.log(err));
+}
+
 
 
 async function downloadQUEST(url, fileName, hash, message, channel) {
@@ -314,6 +391,43 @@ async function downloadGLIMQUEST(url, fileName, hash, message) {
         });
     });
 }
+
+async function downloadTHETAQUEST(url, fileName, hash, message) {
+    await new Promise((resolve, reject) => {
+        console.log(`* Downloading map...`);
+        const mapsFolder = `maps`;
+        if (!fs.existsSync(mapsFolder)){
+            fs.mkdirSync(mapsFolder);
+        }
+        const filePath = `${mapsFolder}/${fileName}`;
+        const fileStream = fs.createWriteStream(filePath);
+            http.get(`${url}`, function(response) {
+                response.pipe(fileStream);
+            });
+        fileStream.on("finish", function() {
+            
+			console.log(`* Downloaded "${fileName}"`);
+            
+			var msgdata = message;
+			
+			fetch("https://api.theta.tv/v1/channel/" + config.theta.channelid + "/channel_action", {
+				body: "{\"type\":\"chat_message\",\"message\":\"" + msgdata + "\"}",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Auth-Token": config.theta.token,
+					"X-Auth-User": config.theta.user
+				},
+				method: "POST"
+			})
+			
+            if (questConnected) {
+                extractZipQUEST(hash, filePath);
+            }
+            resolve();
+        });
+    });
+}
+
 
 async function extractZipQUEST(hash, source) {
     try {
@@ -396,6 +510,23 @@ function fetchMapInfoGLIMPC(mapId, username) {
         .catch(err => console.log(err));
 }
 
+function fetchMapInfoTHETAPC(mapId, username) {
+    const url = `https://api.beatsaver.com/maps/id/${mapId}`;
+
+    console.log(`* Getting map info...`);
+    fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
+        .then(res => res.json())
+        .then(info => {
+            const versions = info.versions[0]
+            const downloadUrl = versions.downloadURL;
+            const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
+            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
+            downloadTHETAPC(downloadUrl, fileName, versions.hash, message);
+        })
+        .catch(err => console.log(err));
+}
+
+
 async function downloadPC(url, fileName, hash, message, channel) {
     await new Promise((resolve, reject) => {
         console.log(`* Downloading map...`);
@@ -458,6 +589,42 @@ async function downloadGLIMPC(url, fileName, hash, message) {
         });
     });
 }
+
+
+async function downloadTHETAPC(url, fileName, hash, message) {
+    await new Promise((resolve, reject) => {
+        console.log(`* Downloading map...`);
+        const mapsFolder = `maps`;
+        if (!fs.existsSync(mapsFolder)){
+            fs.mkdirSync(mapsFolder);
+        }
+        const filePath = `${mapsFolder}/${fileName}`;
+        const fileStream = fs.createWriteStream(filePath);
+            http.get(`${url}`, function(response) {
+                response.pipe(fileStream);
+            });
+        fileStream.on("finish", function() {
+            console.log(`* Downloaded "${fileName}"`);
+            
+			var msgdata = message;
+			
+			fetch("https://api.theta.tv/v1/channel/" + config.theta.channelid + "/channel_action", {
+				body: "{\"type\":\"chat_message\",\"message\":\"" + msgdata + "\"}",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Auth-Token": config.theta.token,
+					"X-Auth-User": config.theta.user
+				},
+				method: "POST"
+			})
+			
+			
+            extractZipPC(hash, filePath);
+            resolve();
+        });
+    });
+}
+
 
 async function extractZipPC(hash, source) {
     try {
