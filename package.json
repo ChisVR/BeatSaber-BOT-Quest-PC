@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --experimental-modules bot.js"
   },
-  "author": "",
+  "author": "ChisdealHDYT",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^10.0.0",
@@ -18,7 +18,7 @@
     "node-fetch": "^2.6.1",
     "sanitize-filename": "^1.6.3",
     "tmi.js": "^1.8.5",
-	"pubnub": "^4.32.1",
+    "pubnub": "^4.32.1",
     "vimm-chat-lib": "^1.1.0"
   }
 }
