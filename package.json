@@ -19,6 +19,7 @@
     "sanitize-filename": "^1.6.3",
     "tmi.js": "^1.8.5",
     "pubnub": "^4.32.1",
+    "dlivetv-unofficial-api": "^2.2.0",
     "vimm-chat-lib": "^1.1.0"
   }
 }
