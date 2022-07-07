@@ -8,7 +8,7 @@
    },
    "vimm":{
       "toggle":true,
-      "channel":"YOURCHANNEL",
+      "channel": ["YOURCHANNEL"],
       "token":"BOTTOKEN"
    },
    "glimesh":{
